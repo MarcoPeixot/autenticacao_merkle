@@ -1,0 +1,1107 @@
+{
+ "format": 1,
+ "scheme": "patch-v5-single-root",
+ "description": "Vetores de raiz única. Campos em hexadecimal: root.hash, module e proof. expected é OK, ENOPKG (tamanho da prova) ou ENOKEY (caminho não chega à raiz).",
+ "vectors": [
+  {
+   "name": "n1-valido-pos0",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 1,
+    "hash": "a4ecddaa0007ecf17f771051ff5b3b916ac328ce57ded757e41e4a74894f6422"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000000a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "OK"
+  },
+  {
+   "name": "n1-modulo-alterado",
+   "targets": "ligação entre módulo e folha",
+   "root": {
+    "levels": 1,
+    "hash": "a4ecddaa0007ecf17f771051ff5b3b916ac328ce57ded757e41e4a74894f6422"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f1021",
+   "proof": "00000000a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n1-prova-truncada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 1,
+    "hash": "a4ecddaa0007ecf17f771051ff5b3b916ac328ce57ded757e41e4a74894f6422"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000000",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n1-prova-alongada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 1,
+    "hash": "a4ecddaa0007ecf17f771051ff5b3b916ac328ce57ded757e41e4a74894f6422"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000000a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b0000000000000000000000000000000000000000000000000000000000000000",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n1-prova-vazia",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 1,
+    "hash": "a4ecddaa0007ecf17f771051ff5b3b916ac328ce57ded757e41e4a74894f6422"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n1-irmao-alterado",
+   "targets": "caminho até a raiz",
+   "root": {
+    "levels": 1,
+    "hash": "a4ecddaa0007ecf17f771051ff5b3b916ac328ce57ded757e41e4a74894f6422"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000000a89d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n1-posicao-bits-altos",
+   "targets": "posição: mesmo percurso, folha diferente",
+   "root": {
+    "levels": 1,
+    "hash": "a4ecddaa0007ecf17f771051ff5b3b916ac328ce57ded757e41e4a74894f6422"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000002a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n1-posicao-inexistente",
+   "targets": "posição: primeira posição depois do último módulo",
+   "root": {
+    "levels": 1,
+    "hash": "a4ecddaa0007ecf17f771051ff5b3b916ac328ce57ded757e41e4a74894f6422"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n1-raiz-de-outra-arvore",
+   "targets": "raiz",
+   "root": {
+    "levels": 1,
+    "hash": "7f2e8c6430b593db7025456cb7bc3ded4b983222c54d40e3c24370ea2e9c4b39"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000000a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n1-niveis-da-raiz-adulterados",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 2,
+    "hash": "a4ecddaa0007ecf17f771051ff5b3b916ac328ce57ded757e41e4a74894f6422"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000000a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n2-valido-pos0",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 1,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "000000004f10430fdf711f4b45f4e55c2686d6a5d20895f12108c8b45260e1a13bea3ab8",
+   "expected": "OK"
+  },
+  {
+   "name": "n2-valido-pos1",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 1,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "OK"
+  },
+  {
+   "name": "n2-modulo-alterado",
+   "targets": "ligação entre módulo e folha",
+   "root": {
+    "levels": 1,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f3031323334353621",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n2-prova-truncada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 1,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000001",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n2-prova-alongada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 1,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b0000000000000000000000000000000000000000000000000000000000000000",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n2-prova-vazia",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 1,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n2-irmao-alterado",
+   "targets": "caminho até a raiz",
+   "root": {
+    "levels": 1,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000001a89d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n2-posicao-bits-altos",
+   "targets": "posição: mesmo percurso, folha diferente",
+   "root": {
+    "levels": 1,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000003a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n2-prova-de-outro-modulo",
+   "targets": "ligação entre módulo e prova",
+   "root": {
+    "levels": 1,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n2-posicao-de-outro-modulo",
+   "targets": "posição: trocada por outra posição real",
+   "root": {
+    "levels": 1,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000000a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n2-raiz-de-outra-arvore",
+   "targets": "raiz",
+   "root": {
+    "levels": 1,
+    "hash": "e0d9ebdd21c6a9ce9e33b0aefaa143453e527e597f1a5460a8c60075ee77c5c5"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n2-niveis-da-raiz-adulterados",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 2,
+    "hash": "b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n3-valido-pos0",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "000000004f10430fdf711f4b45f4e55c2686d6a5d20895f12108c8b45260e1a13bea3ab895822b9f7f1e4c6b6ab0bfa9fb37af62fa0e011d71094b5d3255c0eb7f1f8136",
+   "expected": "OK"
+  },
+  {
+   "name": "n3-valido-pos1",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b95822b9f7f1e4c6b6ab0bfa9fb37af62fa0e011d71094b5d3255c0eb7f1f8136",
+   "expected": "OK"
+  },
+  {
+   "name": "n3-valido-pos2",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000002016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c",
+   "expected": "OK"
+  },
+  {
+   "name": "n3-modulo-alterado",
+   "targets": "ligação entre módulo e folha",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c21",
+   "proof": "00000002016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n3-prova-truncada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000002016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n3-prova-alongada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000002016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c0000000000000000000000000000000000000000000000000000000000000000",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n3-prova-vazia",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n3-irmao-alterado",
+   "targets": "caminho até a raiz",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000002006d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n3-irmaos-trocados",
+   "targets": "ordem dos irmãos",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000002b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n3-posicao-bits-altos",
+   "targets": "posição: mesmo percurso, folha diferente",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000006016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n3-posicao-inexistente",
+   "targets": "posição: primeira posição depois do último módulo",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000003016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n3-prova-de-outro-modulo",
+   "targets": "ligação entre módulo e prova",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000002016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n3-posicao-de-outro-modulo",
+   "targets": "posição: trocada por outra posição real",
+   "root": {
+    "levels": 2,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000000016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n3-raiz-de-outra-arvore",
+   "targets": "raiz",
+   "root": {
+    "levels": 2,
+    "hash": "842fdb864199021f846606c01d89c4986b427e376574a0f79d25df630dfa5766"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000002016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n3-niveis-da-raiz-adulterados",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 3,
+    "hash": "6876649cc4279bb24bbad45a848963bf105c766d90089fedd60f694f36644efd"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000002016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n5-valido-pos0",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "000000004f10430fdf711f4b45f4e55c2686d6a5d20895f12108c8b45260e1a13bea3ab894b3ee005f315d8e85a25530ce9a8f15c3ee879ab689ba5ab43b5fd5d068405c1562b3fed72b034858ea9027760700d78b5ea6f7b945bd38e002ec7cd03f9bbf",
+   "expected": "OK"
+  },
+  {
+   "name": "n5-valido-pos1",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b94b3ee005f315d8e85a25530ce9a8f15c3ee879ab689ba5ab43b5fd5d068405c1562b3fed72b034858ea9027760700d78b5ea6f7b945bd38e002ec7cd03f9bbf",
+   "expected": "OK"
+  },
+  {
+   "name": "n5-valido-pos2",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000002666c7a99e251bff899c0f8b7527a893f37bd2b725efa6fd7cf699e365b52cf99b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c1562b3fed72b034858ea9027760700d78b5ea6f7b945bd38e002ec7cd03f9bbf",
+   "expected": "OK"
+  },
+  {
+   "name": "n5-valido-pos3",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030333a6f707172737475767778797a7b7c7d7e7f808182",
+   "proof": "00000003016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9c1562b3fed72b034858ea9027760700d78b5ea6f7b945bd38e002ec7cd03f9bbf",
+   "expected": "OK"
+  },
+  {
+   "name": "n5-valido-pos4",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "00000004b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "OK"
+  },
+  {
+   "name": "n5-modulo-alterado",
+   "targets": "ligação entre módulo e folha",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a821",
+   "proof": "00000004b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n5-prova-truncada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "00000004b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n5-prova-alongada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "00000004b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad53450000000000000000000000000000000000000000000000000000000000000000",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n5-prova-vazia",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n5-irmao-alterado",
+   "targets": "caminho até a raiz",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "00000004b62c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n5-irmaos-trocados",
+   "targets": "ordem dos irmãos",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "00000004b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25dafb72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n5-posicao-bits-altos",
+   "targets": "posição: mesmo percurso, folha diferente",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "0000000cb72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n5-posicao-inexistente",
+   "targets": "posição: primeira posição depois do último módulo",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "00000005b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n5-prova-de-outro-modulo",
+   "targets": "ligação entre módulo e prova",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000004b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n5-posicao-de-outro-modulo",
+   "targets": "posição: trocada por outra posição real",
+   "root": {
+    "levels": 3,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "00000000b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n5-raiz-de-outra-arvore",
+   "targets": "raiz",
+   "root": {
+    "levels": 3,
+    "hash": "97946a49fb8a58c77eb81bf38844e1f0d1ec7e1427020bff29a0c58efcea0d4a"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "00000004b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n5-niveis-da-raiz-adulterados",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 4,
+    "hash": "5442738adccd48ac7f8a070c8b911e95509a36ed96c3679e0fbe38187660259e"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "00000004b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3b71e89b9947c7aa5de82aa64610d528eca98c60bc5dc8fcdf8b5f8d239f25daf859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n8-valido-pos0",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "000000004f10430fdf711f4b45f4e55c2686d6a5d20895f12108c8b45260e1a13bea3ab894b3ee005f315d8e85a25530ce9a8f15c3ee879ab689ba5ab43b5fd5d068405ca71f31aecea9a5e6d7f5edd87f784660b1f16accbe5eebd8e765f9220a45cb8b",
+   "expected": "OK"
+  },
+  {
+   "name": "n8-valido-pos1",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b94b3ee005f315d8e85a25530ce9a8f15c3ee879ab689ba5ab43b5fd5d068405ca71f31aecea9a5e6d7f5edd87f784660b1f16accbe5eebd8e765f9220a45cb8b",
+   "expected": "OK"
+  },
+  {
+   "name": "n8-valido-pos2",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000002666c7a99e251bff899c0f8b7527a893f37bd2b725efa6fd7cf699e365b52cf99b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9ca71f31aecea9a5e6d7f5edd87f784660b1f16accbe5eebd8e765f9220a45cb8b",
+   "expected": "OK"
+  },
+  {
+   "name": "n8-valido-pos3",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030333a6f707172737475767778797a7b7c7d7e7f808182",
+   "proof": "00000003016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9ca71f31aecea9a5e6d7f5edd87f784660b1f16accbe5eebd8e765f9220a45cb8b",
+   "expected": "OK"
+  },
+  {
+   "name": "n8-valido-pos4",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "000000047843d44804b246d1c77c592c9436657d55a3540a735b9e9ee49e19b4978c3149eb0e0bf8d0ac4edeffd3ed3e73475087281ac6bf0a1ccaadfd0d6f3cabd1f58f859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "OK"
+  },
+  {
+   "name": "n8-valido-pos5",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030353ab9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdce",
+   "proof": "00000005b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3eb0e0bf8d0ac4edeffd3ed3e73475087281ac6bf0a1ccaadfd0d6f3cabd1f58f859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "OK"
+  },
+  {
+   "name": "n8-valido-pos6",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030363adedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4",
+   "proof": "000000060139b7e530b0888399fd6d0b4e7df3374e0e6ec2c581853f48bcca745a4ff78e036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "OK"
+  },
+  {
+   "name": "n8-valido-pos7",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "00000007049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "OK"
+  },
+  {
+   "name": "n8-modulo-alterado",
+   "targets": "ligação entre módulo e folha",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a21",
+   "proof": "00000007049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n8-prova-truncada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "00000007049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n8-prova-alongada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "00000007049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad53450000000000000000000000000000000000000000000000000000000000000000",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n8-prova-vazia",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n8-irmao-alterado",
+   "targets": "caminho até a raiz",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "00000007059cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n8-irmaos-trocados",
+   "targets": "ordem dos irmãos",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "00000007036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n8-posicao-bits-altos",
+   "targets": "posição: mesmo percurso, folha diferente",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "0000000f049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n8-prova-de-outro-modulo",
+   "targets": "ligação entre módulo e prova",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000007049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n8-posicao-de-outro-modulo",
+   "targets": "posição: trocada por outra posição real",
+   "root": {
+    "levels": 3,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "00000000049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n8-raiz-de-outra-arvore",
+   "targets": "raiz",
+   "root": {
+    "levels": 3,
+    "hash": "f0449988a816b238d42558e118dc7421683f05d486124ec777be54577ca07b41"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "00000007049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n8-niveis-da-raiz-adulterados",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 4,
+    "hash": "b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "00000007049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad5345",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n13-valido-pos0",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "000000004f10430fdf711f4b45f4e55c2686d6a5d20895f12108c8b45260e1a13bea3ab894b3ee005f315d8e85a25530ce9a8f15c3ee879ab689ba5ab43b5fd5d068405ca71f31aecea9a5e6d7f5edd87f784660b1f16accbe5eebd8e765f9220a45cb8b7db8a82a6c784219481c52d548d7c629f533c24ced9e5cdebb23fec33390239f",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos1",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030313a25262728292a2b2c2d2e2f30313233343536",
+   "proof": "00000001a99d9238b4c083aa0bd53db693f646588a5db92c5c9fc81085dc81d8e5a4cf7b94b3ee005f315d8e85a25530ce9a8f15c3ee879ab689ba5ab43b5fd5d068405ca71f31aecea9a5e6d7f5edd87f784660b1f16accbe5eebd8e765f9220a45cb8b7db8a82a6c784219481c52d548d7c629f533c24ced9e5cdebb23fec33390239f",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos2",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030323a4a4b4c4d4e4f505152535455565758595a5b5c",
+   "proof": "00000002666c7a99e251bff899c0f8b7527a893f37bd2b725efa6fd7cf699e365b52cf99b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9ca71f31aecea9a5e6d7f5edd87f784660b1f16accbe5eebd8e765f9220a45cb8b7db8a82a6c784219481c52d548d7c629f533c24ced9e5cdebb23fec33390239f",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos3",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030333a6f707172737475767778797a7b7c7d7e7f808182",
+   "proof": "00000003016d5045ea3e59ada54700e87137b385d79b95e4cfd92e787bb9f7e29bf4ec37b96a031f8fece5d7bccad791e51474cd99154a00777f9c97b7a58bd3aaf68b9ca71f31aecea9a5e6d7f5edd87f784660b1f16accbe5eebd8e765f9220a45cb8b7db8a82a6c784219481c52d548d7c629f533c24ced9e5cdebb23fec33390239f",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos4",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030343a9495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8",
+   "proof": "000000047843d44804b246d1c77c592c9436657d55a3540a735b9e9ee49e19b4978c3149eb0e0bf8d0ac4edeffd3ed3e73475087281ac6bf0a1ccaadfd0d6f3cabd1f58f859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad53457db8a82a6c784219481c52d548d7c629f533c24ced9e5cdebb23fec33390239f",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos5",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030353ab9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdce",
+   "proof": "00000005b72c2eeaa3f2c700a7bbac894c1167dc9218dfd81818415ba0296605040454a3eb0e0bf8d0ac4edeffd3ed3e73475087281ac6bf0a1ccaadfd0d6f3cabd1f58f859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad53457db8a82a6c784219481c52d548d7c629f533c24ced9e5cdebb23fec33390239f",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos6",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030363adedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4",
+   "proof": "000000060139b7e530b0888399fd6d0b4e7df3374e0e6ec2c581853f48bcca745a4ff78e036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad53457db8a82a6c784219481c52d548d7c629f533c24ced9e5cdebb23fec33390239f",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos7",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030373a030405060708090a0b0c0d0e0f101112131415161718191a",
+   "proof": "00000007049cbfbce3f094b9351295e91effb9af3e6cdda47c04d97f93c8f0431b691189036dae4788da4df4983b8cb32b5d1e5c777ace7725bc306cf641f8885cd9cf15859fa983bfc3f40ccd02d1b26c1f4ede8d4502e179eceb81eb97abefb3ad53457db8a82a6c784219481c52d548d7c629f533c24ced9e5cdebb23fec33390239f",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos8",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030383a28292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40",
+   "proof": "0000000802732166f7951c74ecf12f538a31b0c4afd3b7ae6bac38200160684f48433b491311e8a4ea54503a65aaf8f0acafc975c1c3873eb0f1d7534b44b14d6433eaefc407b2d879c48b5b8e7d04778fa7f0e872c6104c25980395004e245959aca08eb837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos9",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030393a4d4e4f505152535455565758595a5b5c5d5e5f60616263646566",
+   "proof": "00000009ae621417abe83c861995e942780a274b6d6eefd431deeffb92715e0892d47a5b1311e8a4ea54503a65aaf8f0acafc975c1c3873eb0f1d7534b44b14d6433eaefc407b2d879c48b5b8e7d04778fa7f0e872c6104c25980395004e245959aca08eb837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos10",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031303a72737475767778797a7b7c7d7e7f808182838485868788898a8b8c",
+   "proof": "0000000aa92100382f830038ee4f595769015b2b06f56c28a38fe6a783e5f7ce058f3dec9c23acf29e70ac0d90a0c1c703664033859c763b244b1c32e22d527fa777fe5cc407b2d879c48b5b8e7d04778fa7f0e872c6104c25980395004e245959aca08eb837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos11",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031313a9798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2",
+   "proof": "0000000b627ef236796f8e352e8c3f71a65a6a0eb227c2d5315e1beafe7a3a38c99d7bbc9c23acf29e70ac0d90a0c1c703664033859c763b244b1c32e22d527fa777fe5cc407b2d879c48b5b8e7d04778fa7f0e872c6104c25980395004e245959aca08eb837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-valido-pos12",
+   "targets": "prova legítima",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "0000000ceba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "OK"
+  },
+  {
+   "name": "n13-modulo-alterado",
+   "targets": "ligação entre módulo e folha",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d821",
+   "proof": "0000000ceba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n13-prova-truncada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "0000000ceba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n13-prova-alongada",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "0000000ceba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c30070000000000000000000000000000000000000000000000000000000000000000",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n13-prova-vazia",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "n13-irmao-alterado",
+   "targets": "caminho até a raiz",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "0000000ceaa677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n13-irmaos-trocados",
+   "targets": "ordem dos irmãos",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "0000000cba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042eba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eb581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n13-posicao-bits-altos",
+   "targets": "posição: mesmo percurso, folha diferente",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "0000001ceba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n13-posicao-inexistente",
+   "targets": "posição: primeira posição depois do último módulo",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "0000000deba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n13-prova-de-outro-modulo",
+   "targets": "ligação entre módulo e prova",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "0000000ceba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n13-posicao-de-outro-modulo",
+   "targets": "posição: trocada por outra posição real",
+   "root": {
+    "levels": 4,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "00000000eba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n13-raiz-de-outra-arvore",
+   "targets": "raiz",
+   "root": {
+    "levels": 4,
+    "hash": "4202fb019b92b4ec58ee8ced938d7125f685533de1d84c15f4155d7fe0d99757"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "0000000ceba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "n13-niveis-da-raiz-adulterados",
+   "targets": "checagem de tamanho",
+   "root": {
+    "levels": 5,
+    "hash": "11c551ea284d3e4f6447c0fce1fe5da3500c46db3a6ed3cebaa5e893113108c6"
+   },
+   "module": "6d6f64756c6f2d30303031323abcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8",
+   "proof": "0000000ceba677ea6ff4beb3f33bbd2becf29f96af3f2d3fc29ab9023490004e06968f2eba42daba0ecda6614f786466e1c450badaa8822e13ba3cb352ee8dabb3cd7042b581d4c9d90988da86f777155069987774e172e2d8ddcb71e44f8c2cfc577659b837dd24a7cdcd9ec1b23814018a033f604aeaf8b723cac7df1f93594d1c3007",
+   "expected": "ENOPKG"
+  },
+  {
+   "name": "vazia-recusa-tudo",
+   "targets": "raiz sem módulos",
+   "root": {
+    "levels": 0,
+    "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "00000000",
+   "expected": "ENOKEY"
+  },
+  {
+   "name": "vazia-prova-com-irmao",
+   "targets": "raiz sem módulos: checagem de tamanho",
+   "root": {
+    "levels": 0,
+    "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+   },
+   "module": "6d6f64756c6f2d30303030303a000102030405060708090a0b0c0d0e0f10",
+   "proof": "000000004f10430fdf711f4b45f4e55c2686d6a5d20895f12108c8b45260e1a13bea3ab8",
+   "expected": "ENOPKG"
+  }
+ ]
+}

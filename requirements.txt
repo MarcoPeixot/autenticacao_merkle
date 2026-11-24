@@ -1,0 +1,2 @@
+# Nenhuma dependência externa por enquanto: tudo roda com a biblioteca padrão
+# do Python 3.9 ou mais novo. Quando alguma entrar, é aqui que ela fica.
