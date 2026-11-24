@@ -30,6 +30,7 @@ ENOPKG = "ENOPKG"     # a prova não tem o tamanho esperado
 ENOKEY = "ENOKEY"     # o caminho recalculado não chega à raiz
 
 LeafHash = Callable[[int, bytes], bytes]
+NodeHash = Callable[[bytes, bytes], bytes]
 
 
 def hash_data(pos: int, data: bytes) -> bytes:
@@ -75,9 +76,17 @@ class MerkleTree:
     As folhas ficam na ordem recebida, que no patch é a de ``modules.order``,
     e a posição de cada módulo é o seu índice nessa lista. Quando um nível tem
     quantidade ímpar de nós, o último é pareado consigo mesmo.
+
+    ``leaf_hash`` e ``node_hash`` só mudam nas variantes e nos experimentos.
+    Os valores padrão são os do patch.
     """
 
-    def __init__(self, modules: Sequence[bytes], leaf_hash: LeafHash = hash_data):
+    def __init__(
+        self,
+        modules: Sequence[bytes],
+        leaf_hash: LeafHash = hash_data,
+        node_hash: NodeHash = hash_entry,
+    ):
         if not modules:
             raise ValueError("árvore sem módulos; a raiz desse caso é EMPTY_ROOT")
 
@@ -92,7 +101,7 @@ class MerkleTree:
             cur = []
             for n in range(0, len(prev), 2):
                 right = prev[n + 1] if n + 1 < len(prev) else prev[n]
-                cur.append(hash_entry(prev[n], right))
+                cur.append(node_hash(prev[n], right))
             self.level_hashes.append(cur)
             prev = cur
 
@@ -139,19 +148,23 @@ def proof_size(levels: int) -> int:
     return POS_SIZE + HASH_SIZE * levels
 
 
-def module_hashes_verify_proof(root: Root, pos: int, hash_sigs: Sequence[bytes], cur: bytes) -> bool:
+def module_hashes_verify_proof(
+    root: Root, pos: int, hash_sigs: Sequence[bytes], cur: bytes, node_hash: NodeHash = hash_entry
+) -> bool:
     """Sobe o caminho: a cada nível, o bit menos significativo de ``pos``
     decide se o hash corrente entra à esquerda ou à direita."""
     for i in range(root.levels):
         if pos & 1 == 0:
-            cur = hash_entry(cur, hash_sigs[i])
+            cur = node_hash(cur, hash_sigs[i])
         else:
-            cur = hash_entry(hash_sigs[i], cur)
+            cur = node_hash(hash_sigs[i], cur)
         pos >>= 1
     return cur == root.hash
 
 
-def module_hash_check(root: Root, mod: bytes, sig: bytes, leaf_hash: LeafHash = hash_data) -> str:
+def module_hash_check(
+    root: Root, mod: bytes, sig: bytes, leaf_hash: LeafHash = hash_data, node_hash: NodeHash = hash_entry
+) -> str:
     """Decide se o módulo ``mod`` é aceito com a prova ``sig`` contra ``root``.
 
     Devolve ``OK``, ``ENOPKG`` (tamanho da prova errado) ou ``ENOKEY``
@@ -167,6 +180,6 @@ def module_hash_check(root: Root, mod: bytes, sig: bytes, leaf_hash: LeafHash = 
     ]
 
     modhash = leaf_hash(pos, mod)
-    if not module_hashes_verify_proof(root, pos, hash_sigs, modhash):
+    if not module_hashes_verify_proof(root, pos, hash_sigs, modhash, node_hash):
         return ENOKEY
     return OK

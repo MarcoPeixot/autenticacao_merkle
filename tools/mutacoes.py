@@ -51,10 +51,10 @@ MUTACOES = {
     ),
     "percurso ignora a posição": (
         "        if pos & 1 == 0:\n"
-        "            cur = hash_entry(cur, hash_sigs[i])\n"
+        "            cur = node_hash(cur, hash_sigs[i])\n"
         "        else:\n"
-        "            cur = hash_entry(hash_sigs[i], cur)",
-        "        cur = hash_entry(cur, hash_sigs[i])",
+        "            cur = node_hash(hash_sigs[i], cur)",
+        "        cur = node_hash(cur, hash_sigs[i])",
     ),
 }
 

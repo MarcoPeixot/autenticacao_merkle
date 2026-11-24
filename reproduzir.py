@@ -1,4 +1,4 @@
-"""Roda tudo de uma vez: testes, teste de mutação, experimento da posição,
+"""Roda tudo de uma vez: testes, teste de mutação, os dois experimentos,
 tabela de tamanhos e vetores de teste.
 
     python3 reproduzir.py
@@ -18,6 +18,7 @@ PASSOS = [
     ("testes", ["-m", "unittest"]),
     ("teste de mutação", ["-m", "tools.mutacoes"]),
     ("experimento da posição", ["-m", "tools.experimento_posicao", "--gravar"]),
+    ("experimento multi-alvo", ["-m", "tools.experimento_multialvo", "--gravar"]),
     ("tabela de tamanhos", ["-m", "tools.tamanhos_de_prova", "--gravar"]),
     ("vetores de teste", ["-m", "tools.gerar_vetores", "--gravar"]),
 ]

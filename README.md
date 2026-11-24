@@ -27,11 +27,20 @@ Ficou pronto o esquema de raiz única, igual ao do patch. Múltiplas raízes ain
 5. **Tamanho da prova** (`docs/tamanhos-de-prova.md`). Medimos nas 12 configurações da proposta.
 6. **Vetores de teste** (`vectors/raiz-unica.json`). São 100 casos com entrada e resposta esperada, que o verificador em C vai usar depois.
 
+## Segunda entrega (24/11/2026)
+
+Testamos a hipótese que faltava, a multi-alvo. Agora as duas têm veredito.
+
+1. **Experimento** (`tools/experimento_multialvo.py`). Busca com o hash truncado a 14 bits contra todos os nós internos, em 1, 4 e 16 árvores e em três formatos de folha.
+2. **Modelo** (`ref/merkle.py`, `ref/variantes.py`). A árvore e o verificador passaram a aceitar outro hash de nó, para o mesmo código rodar com hash truncado. Entraram duas variantes: hash truncado e folha com o número da árvore.
+3. **Testes** (`tests/test_multialvo.py`). Mais 15, agora são 60.
+4. **Registro** (`docs/hipoteses.md`). O que testamos, o resultado e os limites.
+
 ## Resultados
 
 ### Testes
 
-45 de 45 passando, em Python 3.9 e 3.15. No teste de mutação os testes pegaram os 8 defeitos.
+60 de 60 passando, em Python 3.9 e 3.15. No teste de mutação os testes pegaram os 8 defeitos.
 
 ### Hipótese da posição: descartada
 
@@ -44,7 +53,27 @@ Tentamos todo módulo com toda posição e com os irmãos de toda prova, em árv
 
 No patch nada passa, porque a posição entra no hash da folha. Tirando a posição da folha, o mesmo módulo passa em posições erradas: com 3 módulos, o módulo 2 passa também na posição 3.
 
-O teste só reaproveita provas e módulos legítimos. Buscar colisão é a outra hipótese (multi-alvo), que ainda não testamos.
+O teste só reaproveita provas e módulos legítimos. Buscar colisão é a outra hipótese, a multi-alvo.
+
+### Hipótese multi-alvo: só vale entre árvores
+
+O nó interno não diz de que nível, índice ou árvore ele é. Na proposta usamos como pior caso que um hash do atacante valesse contra todos os nós, cerca de 2^14, o que levaria uma segunda pré-imagem de 2^256 para 2^242.
+
+Truncamos o hash para 14 bits e deixamos o atacante comparar cada tentativa com todos os nós internos de todas as árvores (64 módulos por árvore, 1.048.576 tentativas). Com um alvo só, o esperado é 64 provas aceitas.
+
+| Formato da folha | Árvores | Nós comparados | Coincidências | Provas aceitas | Ganho |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Patch | 1 | 63 | 4.001 | 62 | 1,0 |
+| Patch | 4 | 252 | 16.115 | 259 | 4,0 |
+| Patch | 16 | 1.008 | 64.175 | 1.077 | 16,8 |
+| Sem posição | 16 | 1.008 | 64.539 | 32.801 | 512,5 |
+| Com o número da árvore | 16 | 1.008 | 64.166 | 69 | 1,1 |
+
+Dentro de uma árvore o atacante não ganha nada: a coincidência aparece, mas a prova só fecha no nó que fica acima da posição declarada. Entre árvores ganha, e o ganho é o número de raízes. Com 16 raízes são 4 bits, perto de 2^252, e não 2^242.
+
+Colocar o número da árvore na folha tira esse ganho sem mudar os nós internos nem o tamanho da prova.
+
+Vale para busca clássica com hash truncado. A conta quântica ainda falta.
 
 ### Tamanho da prova
 
@@ -71,16 +100,17 @@ cd autenticacao_merkle
 python3 reproduzir.py
 ```
 
-Leva uns 5 segundos e a saída é esta:
+Leva uns 10 segundos e a saída é esta:
 
 ```
 ok      testes                     0.1s   OK
-ok      teste de mutação           1.1s   8 de 8 defeitos detectados
-ok      experimento da posição     3.0s   gravado em docs/experimento-posicao.md
+ok      teste de mutação           1.4s   8 de 8 defeitos detectados
+ok      experimento da posição     2.9s   gravado em docs/experimento-posicao.md
+ok      experimento multi-alvo     3.6s   gravado em docs/experimento-multialvo.md
 ok      tabela de tamanhos         0.1s   gravado em docs/ e bench/
 ok      vetores de teste           0.0s   gravado em vectors/raiz-unica.json
 
-tudo certo em 4.4s
+tudo certo em 8.2s
 ```
 
 Os arquivos em `docs/`, `bench/` e `vectors/` são regravados e têm de sair iguais (`git status` fica limpo).
@@ -97,6 +127,7 @@ Para rodar uma parte só:
 python3 -m unittest                             # testes
 python3 -m tools.mutacoes                       # teste de mutação dos testes
 python3 -m tools.experimento_posicao --gravar   # experimento da posição
+python3 -m tools.experimento_multialvo --gravar # experimento multi-alvo
 python3 -m tools.tamanhos_de_prova --gravar     # tabela de tamanhos
 python3 -m tools.gerar_vetores --gravar         # vetores de teste
 ```
@@ -104,7 +135,7 @@ python3 -m tools.gerar_vetores --gravar         # vetores de teste
 ## Falta
 
 - comparar com a ferramenta do próprio patch (até agora conferimos lendo o código; rodar precisa de Linux)
-- hipótese multi-alvo
+- conta do multi-alvo no caso quântico
 - especificação do manifesto e da política
 - múltiplas raízes no modelo e nos vetores
 - verificador em C
