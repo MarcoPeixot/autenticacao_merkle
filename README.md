@@ -45,11 +45,19 @@ Rodamos o código do próprio patch num container Linux e comparamos com o model
 3. **Apoio** (`tools/patch_no_linux/`). Para o `hashes.c` compilar fora do kernel, trocamos o SHA-256, as macros e os códigos de erro do kernel pelos equivalentes em espaço de usuário. O `hashes.c` não muda.
 4. **Testes** (`tests/test_comparacao_com_patch.py`). Mais 6, agora são 66. Um deles confere os arquivos de `patch-v5/` a cada rodada.
 
+## Quarta entrega (25/11/2026)
+
+Conferimos que o ambiente tem ML-DSA, que é o que vai assinar os manifestos, e medimos os três conjuntos do FIPS 204.
+
+1. **Medição** (`tools/ml_dsa/medir.c`, `tools/medir_ml_dsa.py`). Roda no mesmo Debian 13 da comparação. Gera as chaves, confere os tamanhos com o FIPS 204, confere que assinatura alterada não passa e mede o tempo de gerar a chave, assinar e verificar.
+2. **Testes** (`tests/test_ml_dsa.py`). Mais 13, agora são 79.
+3. **Resultado** (`docs/ml-dsa.md`).
+
 ## Resultados
 
 ### Testes
 
-66 de 66 passando, em Python 3.9 e 3.15. No teste de mutação os testes pegaram os 8 defeitos.
+79 de 79 passando, em Python 3.9 e 3.15. No teste de mutação os testes pegaram os 8 defeitos.
 
 ### Comparação com o código do patch: igual
 
@@ -114,6 +122,28 @@ A assinatura ML-DSA mais curta (ML-DSA-44) tem 2.420 bytes, 5,8 vezes a maior pr
 
 Falta somar o manifesto assinado de cada raiz extra, que ainda não tem formato definido.
 
+### ML-DSA no ambiente: os três conjuntos funcionam
+
+O OpenSSL 3.5.9 do Debian 13 tem ML-DSA-44, 65 e 87. Nos três, os tamanhos batem com o FIPS 204 e a assinatura válida passa. Mensagem alterada, assinatura alterada, assinatura cortada e chave de outro par não passam.
+
+| Conjunto | Categoria do NIST | Chave pública (bytes) | Assinatura (bytes) | Assinar (µs) | Verificar (µs) |
+| -------------- | ----------: | -------------: | -------------: | -----------: | -----------: |
+| ML-DSA-44 | 2 | 1.312 | 2.420 | 306 | 57 |
+| ML-DSA-65 | 3 | 1.952 | 3.309 | 460 | 86 |
+| ML-DSA-87 | 5 | 2.592 | 4.627 | 556 | 134 |
+
+Os tempos são a mediana de 30 rodadas, com uma mensagem de 128 bytes. Os quartis estão em `docs/ml-dsa.md`.
+
+Para o kernel o que pesa é verificar. Se cada raiz extra tiver um manifesto verificado uma vez, 16 raízes com ML-DSA-87 somam uns 2 ms. Assinar fica com a autoridade, fora da máquina, e varia mais porque o ML-DSA repete uma etapa interna um número aleatório de vezes.
+
+Qual conjunto usar ainda é decisão do grupo. Estes números entram nela.
+
+Os tempos são de um Apple M5 rodando Linux aarch64 no Docker. Servem para comparar os conjuntos entre si, não como valor absoluto. Não medimos em x86_64.
+
+O `openssl` que vem no macOS é o LibreSSL 3.3.6, que não tem ML-DSA. No Mac, use o Docker, como aqui, ou o OpenSSL do Homebrew.
+
+Para ver se a medição acusa erro, rodamos uma cópia do programa que não alterava a assinatura. Nos três conjuntos a assinatura "alterada" passou e o script apontou o problema.
+
 ## Rodar
 
 Só precisa de Python 3.9 ou mais novo.
@@ -156,11 +186,14 @@ python3 -m tools.tamanhos_de_prova --gravar     # tabela de tamanhos
 python3 -m tools.gerar_vetores --gravar         # vetores de teste
 ```
 
-A comparação com o código do patch fica fora do `reproduzir.py` porque precisa de Docker. Leva menos de um minuto, mais o download da imagem do Debian na primeira vez:
+A comparação com o código do patch e a medição do ML-DSA ficam fora do `reproduzir.py` porque precisam de Docker. Na primeira vez entra também o download da imagem do Debian.
 
 ```
-python3 -m tools.comparar_com_patch --gravar
+python3 -m tools.comparar_com_patch --gravar   # menos de um minuto
+python3 -m tools.medir_ml_dsa --gravar         # uns 10 segundos
 ```
+
+Na medição do ML-DSA, tamanhos e checagens saem sempre iguais. Os tempos mudam um pouco a cada execução.
 
 ## Falta
 
