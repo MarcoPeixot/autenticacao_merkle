@@ -36,11 +36,35 @@ Testamos a hipótese que faltava, a multi-alvo. Agora as duas têm veredito.
 3. **Testes** (`tests/test_multialvo.py`). Mais 15, agora são 60.
 4. **Registro** (`docs/hipoteses.md`). O que testamos, o resultado e os limites.
 
+## Terceira entrega (25/11/2026)
+
+Rodamos o código do próprio patch num container Linux e comparamos com o modelo. Até aqui a conferência tinha sido só lendo o código.
+
+1. **Código do patch** (`patch-v5/`). Os arquivos de que a ferramenta e o verificador precisam, sem nenhuma alteração. Cada um bate com o hash de blob do diff.
+2. **Comparação** (`tools/comparar_com_patch.py`). Compila a ferramenta de compilação e o verificador do kernel num Debian 13 pelo Docker, gera as mesmas árvores do modelo e compara byte a byte.
+3. **Apoio** (`tools/patch_no_linux/`). Para o `hashes.c` compilar fora do kernel, trocamos o SHA-256, as macros e os códigos de erro do kernel pelos equivalentes em espaço de usuário. O `hashes.c` não muda.
+4. **Testes** (`tests/test_comparacao_com_patch.py`). Mais 6, agora são 66. Um deles confere os arquivos de `patch-v5/` a cada rodada.
+
 ## Resultados
 
 ### Testes
 
-60 de 60 passando, em Python 3.9 e 3.15. No teste de mutação os testes pegaram os 8 defeitos.
+66 de 66 passando, em Python 3.9 e 3.15. No teste de mutação os testes pegaram os 8 defeitos.
+
+### Comparação com o código do patch: igual
+
+| | Iguais | Total |
+| ------------------------------------------------------------ | ---------: | ---------: |
+| Raízes geradas pela ferramenta do patch | 76 | 76 |
+| Provas geradas pela ferramenta do patch | 23.154 | 23.154 |
+| Provas da ferramenta aceitas pelo verificador do kernel | 23.154 | 23.154 |
+| Vetores em que o verificador do kernel decide como esperado | 100 | 100 |
+
+As árvores vão de 0 a 64 módulos e depois de 100 a 8.192, passando pelas bordas das potências de 2 e pelos 4.230 módulos do kernel do Debian 13.
+
+Para ver se a comparação acusa erro, rodamos também com o modelo gravando a posição em little-endian: 74 das 76 raízes saíram diferentes.
+
+Rodou em Linux aarch64. Não testamos em x86_64.
 
 ### Hipótese da posição: descartada
 
@@ -62,7 +86,7 @@ O nó interno não diz de que nível, índice ou árvore ele é. Na proposta usa
 Truncamos o hash para 14 bits e deixamos o atacante comparar cada tentativa com todos os nós internos de todas as árvores (64 módulos por árvore, 1.048.576 tentativas). Com um alvo só, o esperado é 64 provas aceitas.
 
 | Formato da folha | Árvores | Nós comparados | Coincidências | Provas aceitas | Ganho |
-| --- | ---: | ---: | ---: | ---: | ---: |
+| ------------------------- | --------: | --------------: | --------------: | --------------: | ------: |
 | Patch | 1 | 63 | 4.001 | 62 | 1,0 |
 | Patch | 4 | 252 | 16.115 | 259 | 4,0 |
 | Patch | 16 | 1.008 | 64.175 | 1.077 | 16,8 |
@@ -132,9 +156,14 @@ python3 -m tools.tamanhos_de_prova --gravar     # tabela de tamanhos
 python3 -m tools.gerar_vetores --gravar         # vetores de teste
 ```
 
+A comparação com o código do patch fica fora do `reproduzir.py` porque precisa de Docker. Leva menos de um minuto, mais o download da imagem do Debian na primeira vez:
+
+```
+python3 -m tools.comparar_com_patch --gravar
+```
+
 ## Falta
 
-- comparar com a ferramenta do próprio patch (até agora conferimos lendo o código; rodar precisa de Linux)
 - conta do multi-alvo no caso quântico
 - especificação do manifesto e da política
 - múltiplas raízes no modelo e nos vetores

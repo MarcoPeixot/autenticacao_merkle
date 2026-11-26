@@ -34,7 +34,11 @@ série mudar algo relevante, a mudança entra como experimento separado.
 
 ## Como a conferência foi feita
 
-Por leitura, função a função, do patch contra `ref/merkle.py`. A ferramenta do
-próprio patch ainda não foi executada para comparar raízes e provas byte a
-byte: ela depende de uma árvore do kernel em Linux. Essa comparação é o
-próximo passo de validação do modelo.
+Primeiro por leitura, função a função, do patch contra `ref/merkle.py`.
+
+Em 25/11/2026 rodamos o próprio código do patch num container Linux. A
+ferramenta de compilação gerou raízes e provas idênticas às do modelo em 76
+árvores (0 a 8.192 módulos), e o verificador do kernel decidiu os 100 vetores
+como o modelo. Os arquivos usados estão em `patch-v5/` e o resultado em
+`docs/comparacao-com-patch.md`. Para refazer:
+`python3 -m tools.comparar_com_patch --gravar` (precisa de Docker).
