@@ -27,6 +27,10 @@ make -C verifier BUILD_DIR=build/sanitizado \
   CFLAGS='-O1 -g -Werror -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer' test
 ```
 
+O `openssl` do macOS é o LibreSSL, sem ML-DSA. No Mac, ou em qualquer máquina
+com Docker, `python3 -m tools.testar_verificador` faz as duas rodadas acima
+no Debian 13 do repositório, sem gravar nada na pasta.
+
 ## Interface de linha de comando
 
 Sem argumentos, `verifier/build/verificar` lê uma linha por caso na entrada padrão, com os

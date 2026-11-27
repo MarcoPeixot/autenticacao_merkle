@@ -186,22 +186,26 @@ python3 -m tools.tamanhos_de_prova --gravar     # tabela de tamanhos
 python3 -m tools.gerar_vetores --gravar         # vetores de teste
 ```
 
-A comparação com o código do patch e a medição do ML-DSA ficam fora do `reproduzir.py` porque precisam de Docker. Na primeira vez entra também o download da imagem do Debian.
+A comparação com o código do patch, a medição do ML-DSA e os testes do verificador em C ficam fora do `reproduzir.py` porque precisam de Docker. Na primeira vez entra também o download da imagem do Debian.
 
 ```
 python3 -m tools.comparar_com_patch --gravar   # menos de um minuto
 python3 -m tools.medir_ml_dsa --gravar         # uns 10 segundos
+python3 -m tools.testar_verificador            # uns 10 segundos
 ```
 
 Na medição do ML-DSA, tamanhos e checagens saem sempre iguais. Os tempos mudam um pouco a cada execução.
 
 ### Verificador em C
 
-`make -C verifier test` compila o verificador padrão e a variante com
-endereços nos hashes internos. O teste compara a raiz única com o Python nos
-100 vetores existentes e exercita os fluxos de múltiplas raízes. A interface e
-o comando com sanitizadores estão em [`verifier/`](verifier/README.md). Os
-formatos e as regras estão em [`spec/`](spec/README.md).
+`python3 -m tools.testar_verificador` compila o verificador padrão e a
+variante com endereços nos hashes internos, no mesmo Debian 13. O teste
+compara a raiz única com o Python nos 100 vetores existentes e exercita os
+fluxos de múltiplas raízes. Roda duas vezes, a segunda com sanitizadores.
+
+Num Linux com OpenSSL 3.5 ou mais novo, dá para rodar direto com
+`make -C verifier test`. A interface está em [`verifier/`](verifier/README.md).
+Os formatos e as regras estão em [`spec/`](spec/README.md).
 
 ## Falta
 
