@@ -35,5 +35,6 @@ Um teste falha se o arquivo estiver diferente do que o gerador produz.
 
 ## O que falta
 
-Os vetores de várias raízes dependem do formato do manifesto e da política,
-que ainda não foram especificados.
+Os vetores compartilhados de várias raízes seguem os formatos da
+[especificação](../spec/README.md). O verificador C já tem casos de integração
+gerados em `tools/testar_mrauth.py`, executados por `make -C verifier test`.

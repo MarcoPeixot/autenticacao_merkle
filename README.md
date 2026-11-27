@@ -195,10 +195,17 @@ python3 -m tools.medir_ml_dsa --gravar         # uns 10 segundos
 
 Na medição do ML-DSA, tamanhos e checagens saem sempre iguais. Os tempos mudam um pouco a cada execução.
 
+### Verificador em C
+
+`make -C verifier test` compila o verificador padrão e a variante com
+endereços nos hashes internos. O teste compara a raiz única com o Python nos
+100 vetores existentes e exercita os fluxos de múltiplas raízes. A interface e
+o comando com sanitizadores estão em [`verifier/`](verifier/README.md). Os
+formatos e as regras estão em [`spec/`](spec/README.md).
+
 ## Falta
 
 - conta do multi-alvo no caso quântico
-- especificação do manifesto e da política
-- múltiplas raízes no modelo e nos vetores
-- verificador em C
+- revisão da especificação e escolha do conjunto ML-DSA
+- modelo Python e vetores compartilhados de múltiplas raízes para o teste diferencial
 - medições de tempo e memória
