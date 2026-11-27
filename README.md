@@ -57,7 +57,7 @@ Conferimos que o ambiente tem ML-DSA, que é o que vai assinar os manifestos, e 
 
 ### Testes
 
-79 de 79 passando, em Python 3.9 e 3.15. No teste de mutação os testes pegaram os 8 defeitos.
+81 de 81 passando, em Python 3.9 e 3.15. No teste de mutação os testes pegaram os 8 defeitos.
 
 ### Comparação com o código do patch: igual
 

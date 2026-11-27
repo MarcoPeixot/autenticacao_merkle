@@ -18,20 +18,21 @@ def executar(*args):
     return subprocess.check_output(args)
 
 
-def montar_prova(arvore, componente, geracao, formato):
+def montar_prova(arvore, componente, geracao, formato, modulos=MODULOS):
+    """Raiz, profundidade e prova do último módulo. A profundidade é pelo menos 1."""
     def folha(posicao, modulo):
         prefixo = struct.pack(">BIIIQ", 3, arvore, posicao, componente, geracao)
         return hashlib.sha256(prefixo + modulo).digest()
 
-    posicao = len(MODULOS) - 1
+    posicao = len(modulos) - 1
     if formato == 1:
-        referencia = MerkleTree(MODULOS, leaf_hash=folha)
+        referencia = MerkleTree(modulos, leaf_hash=folha)
         return referencia.root.hash, referencia.root.levels, referencia.proof(posicao)
 
     irmaos = [struct.pack(">I", posicao)]
-    nos = [folha(i, modulo) for i, modulo in enumerate(MODULOS)]
+    nos = [folha(i, modulo) for i, modulo in enumerate(modulos)]
     nivel = 0
-    while len(nos) > 1:
+    while nivel == 0 or len(nos) > 1:
         if len(nos) % 2:
             nos.append(nos[-1])
         irmaos.append(nos[posicao ^ 1])
@@ -49,24 +50,28 @@ class Cenario:
         self.pasta = pasta
         self.verificador = verificador
         self.formato = formato
+        self.conjunto = conjunto
         self.estado = pasta / "estado"
         self.casos = 0
         self.chaves = {}
-        publicas = {}
+        self.publicas = {}
         for autoridade in (0, 1, 2):
             chave = pasta / f"chave{autoridade}.pem"
             executar("openssl", "genpkey", "-algorithm", f"ML-DSA-{conjunto}", "-out", chave)
             der = executar("openssl", "pkey", "-in", chave, "-pubout", "-outform", "DER")
-            publicas[autoridade] = der[-CHAVE_BYTES[conjunto]:]
+            self.publicas[autoridade] = der[-CHAVE_BYTES[conjunto]:]
             self.chaves[autoridade] = chave
 
-        politica = b"AMPO\x01" + bytes([conjunto]) + publicas[0] + struct.pack(">I", 2)
-        for autoridade, arvore in ((1, 7), (2, 3)):
-            politica += (
-                struct.pack(">I", autoridade) + publicas[autoridade] +
-                struct.pack(">IIIQ", 1, arvore, COMPONENTE, 3)
-            )
-        self.politica = self.arquivo("politica", politica)
+        self.politica = self.arquivo("politica", self.montar_politica({1: (7, 5), 2: (3,)}))
+
+    def montar_politica(self, arvores):
+        """Autoridade -> árvores autorizadas, todas com COMPONENTE e permissões 3."""
+        politica = b"AMPO\x01" + bytes([self.conjunto]) + self.publicas[0] + struct.pack(">I", len(arvores))
+        for autoridade in sorted(arvores):
+            autorizadas = sorted(arvores[autoridade])
+            politica += struct.pack(">I", autoridade) + self.publicas[autoridade] + struct.pack(">I", len(autorizadas))
+            politica += b"".join(struct.pack(">IIQ", arvore, COMPONENTE, 3) for arvore in autorizadas)
+        return politica
 
     def arquivo(self, nome, dados):
         caminho = self.pasta / nome
@@ -85,11 +90,11 @@ class Cenario:
         return self.assinar(corpo, autoridade)
 
     def manifesto(self, *, arvore=7, autoridade=1, versao=1, componente=COMPONENTE, geracao=2,
-                  permissoes=1, folhas=len(MODULOS), ajustar_niveis=0, formato=None):
-        raiz, niveis, prova = montar_prova(arvore, componente, geracao, self.formato)
+                  permissoes=1, folhas=None, ajustar_niveis=0, formato=None, modulos=MODULOS):
+        raiz, niveis, prova = montar_prova(arvore, componente, geracao, self.formato, modulos)
         corpo = struct.pack(
             ">4sBIIQ32sIB32sQ", b"AMMF", formato or self.formato, arvore, autoridade, versao, KERNEL,
-            folhas, niveis + ajustar_niveis, raiz, permissoes,
+            len(modulos) if folhas is None else folhas, niveis + ajustar_niveis, raiz, permissoes,
         )
         manifesto = self.assinar(corpo, autoridade if autoridade in self.chaves else 1)
         return manifesto, prova, raiz
@@ -157,6 +162,9 @@ def testar(executavel, formato, conjunto, pasta, completo):
     caso.verificar("autoridade desconhecida", "AUTORIDADE_NAO_AUTORIZADA", desconhecido, prova)
     fora_da_politica, _, _ = caso.manifesto(versao=2, autoridade=2)
     caso.verificar("autoridade fora da arvore", "AUTORIDADE_NAO_AUTORIZADA", fora_da_politica, prova)
+    ambigua = caso.arquivo("politica ambigua", caso.montar_politica({1: (7,), 2: (3, 7)}))
+    caso.verificar("arvore com duas autoridades", "AUTORIDADE_NAO_AUTORIZADA", manifesto_v2, prova,
+                   politica=ambigua)
     sem_permissao, _, _ = caso.manifesto(versao=3, permissoes=9)
     caso.verificar("permissao", "PERMISSAO_NEGADA", sem_permissao, prova, raiz)
     outro_componente, prova_componente, raiz_componente = caso.manifesto(versao=3, componente=0)
@@ -175,6 +183,10 @@ def testar(executavel, formato, conjunto, pasta, completo):
     caso.verificar("mesma versao com outro manifesto", "ROLLBACK", mesma_versao, prova, raiz)
     reassinado, _, _ = caso.manifesto(versao=2)
     caso.verificar("mesma versao reassinada", "OK", reassinado, prova, raiz)
+
+    unico = (MODULOS[0],)
+    uma_folha, prova_uma, raiz_uma = caso.manifesto(arvore=5, modulos=unico)
+    caso.verificar("arvore de uma folha", "OK", uma_folha, prova_uma, raiz_uma, modulo=unico[0])
 
     revogacao = caso.tabela(2, ((COMPONENTE, 3),))
     caso.gerir("revogar", "revogar", "OK", revogacao)
