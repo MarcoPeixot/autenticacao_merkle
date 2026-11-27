@@ -5,7 +5,14 @@
 
 #include "merkle.h"
 
-enum { MANIFESTO_BYTES = 98, REGISTRO_BYTES = 12 };
+/* Geração mínima: componente:u32 || geração:u64.
+ * Versão de árvore: árvore:u32 || versão:u64 || SHA-256 dos bytes assinados do manifesto. */
+enum {
+    MANIFESTO_BYTES = 98,
+    GERACAO_BYTES = 12,
+    VERSAO_RESUMO = 12,
+    VERSAO_BYTES = VERSAO_RESUMO + HASH_BYTES,
+};
 
 struct conjunto_ml_dsa {
     unsigned char id;
@@ -36,6 +43,7 @@ struct politica_mrauth {
 struct registros {
     const unsigned char *dados;
     uint32_t quantidade;
+    size_t largura;
 };
 
 struct tabela_revogacao {
@@ -54,8 +62,9 @@ bool ler_politica(struct bytes bruto, const struct manifesto *manifesto, uint32_
                   struct politica_mrauth *saida);
 bool ler_revogacao(struct bytes bruto, size_t assinatura_bytes, struct tabela_revogacao *saida);
 bool ler_estado(struct bytes bruto, size_t assinatura_bytes, struct estado_mrauth *saida);
+const unsigned char *buscar_registro(const struct registros *lista, uint32_t id);
 uint64_t valor_registro(const struct registros *lista, uint32_t id);
-bool montar_estado(struct bytes tabela, const struct registros *versoes,
-                   uint32_t arvore, uint64_t versao, struct buffer *saida);
+bool montar_estado(struct bytes tabela, const struct registros *versoes, uint32_t arvore,
+                   uint64_t versao, const unsigned char *resumo, struct buffer *saida);
 
 #endif

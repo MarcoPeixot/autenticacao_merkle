@@ -95,7 +95,7 @@ revogação usam ML-DSA sobre os bytes indicados, com contexto vazio.
 tabela = AMRV || 0x01 || versão:u64 || número de componentes:u32 || entradas || assinatura
 entrada = componente:u32 || geração mínima:u64
 estado = AMES || 0x01 || tamanho da tabela:u32 || tabela aceita || número de árvores:u32 || versões
-versão de árvore = árvore:u32 || maior versão aceita:u64
+versão de árvore = árvore:u32 || maior versão aceita:u64 || resumo do manifesto aceito
 ```
 
 A autoridade de revogação assina todos os campos da tabela que precedem a
@@ -109,7 +109,10 @@ Uma versão inferior, ou igual com outros campos assinados, resulta em
 `ROLLBACK`. Uma geração mínima reduzida resulta em `REVOGACAO_REGRESSIVA`.
 
 O estado é íntegro e persistente. Sua lista de versões é ordenada por árvore,
-sem duplicatas. Uma árvore ausente ainda não tem versão aceita. O verificador
+sem duplicatas. Uma árvore ausente ainda não tem versão aceita. O resumo é o
+SHA-256 dos 98 bytes assinados do manifesto que levou a árvore à versão
+registrada. Outro manifesto com a mesma versão resulta em `ROLLBACK`. O mesmo
+manifesto com outra assinatura válida é aceito, como na tabela. O verificador
 atualiza a versão de uma árvore só depois da aceitação do módulo. A aceitação
 e a atualização usam o mesmo estado, com gravação atômica, para evitar que
 uma verificação atrasada substitua uma versão ou tabela mais recente.
@@ -130,7 +133,7 @@ o motivo. Na aceitação, persistir a atualização de R5 antes de devolver R8.
 | R2 | Verificar a assinatura do manifesto com a chave da política, a autorização da autoridade para a árvore e a compatibilidade com o kernel. Uma árvore com mais de uma autoridade na política é ambígua. | `AUTORIDADE_NAO_AUTORIZADA`, `ASSINATURA_INVALIDA` ou `KERNEL_INCOMPATIVEL` |
 | R3 | Recalcular a folha da árvore identificada no manifesto e exigir que o caminho termine na raiz assinada. | `ENOKEY` |
 | R4 | Exigir uma autorização para o par árvore e componente e que ela cubra todas as permissões pedidas. | `COMPONENTE_NAO_AUTORIZADO` ou `PERMISSAO_NEGADA` |
-| R5 | Recusar uma versão menor que a maior já aceita para a mesma árvore. | `ROLLBACK` |
+| R5 | Recusar uma versão menor que a maior já aceita para a mesma árvore, ou igual com outros campos assinados. | `ROLLBACK` |
 | R6 | Exigir geração igual ou superior à mínima na tabela de revogação aceita. | `REVOGADO` |
 | R7 | Na árvore complementar, conferir profundidade, tamanho da prova e posição. | `FORMATO_INVALIDO`, `ENOPKG` ou `POSICAO_INVALIDA` |
 | R8 | Devolver decisão, raiz, autoridade reconhecida e motivo da recusa. | |

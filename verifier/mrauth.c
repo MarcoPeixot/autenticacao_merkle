@@ -46,6 +46,11 @@ static enum resultado_merkle autenticar_manifesto(const struct politica_mrauth *
     return MERKLE_OK;
 }
 
+static bool resumir_manifesto(struct bytes manifesto, unsigned char resumo[HASH_BYTES])
+{
+    return EVP_Digest(manifesto.dados, MANIFESTO_BYTES, resumo, NULL, EVP_sha256(), NULL) == 1;
+}
+
 static uint32_t profundidade(uint32_t folhas)
 {
     if (folhas <= 1)
@@ -63,8 +68,15 @@ static enum resultado_merkle conferir_modulo(const struct politica_mrauth *polit
                                              const struct entrada_mrauth *entrada,
                                              struct buffer *estado_novo)
 {
-    uint64_t versao_anterior = valor_registro(&estado->versoes, manifesto->arvore);
+    const unsigned char *aceito = buscar_registro(&estado->versoes, manifesto->arvore);
+    const uint64_t versao_anterior = aceito ? ler_u64(aceito + 4) : 0;
+    unsigned char resumo[HASH_BYTES];
+    if (!resumir_manifesto(entrada->manifesto, resumo))
+        return MERKLE_ERRO_CRIPTOGRAFICO;
     if (manifesto->versao < versao_anterior)
+        return MERKLE_ROLLBACK;
+    if (aceito && manifesto->versao == versao_anterior &&
+        memcmp(resumo, aceito + VERSAO_RESUMO, HASH_BYTES) != 0)
         return MERKLE_ROLLBACK;
     if (manifesto->numero_folhas == 0 || manifesto->raiz.niveis != profundidade(manifesto->numero_folhas))
         return MERKLE_FORMATO_INVALIDO;
@@ -84,7 +96,7 @@ static enum resultado_merkle conferir_modulo(const struct politica_mrauth *polit
         return MERKLE_PERMISSAO_NEGADA;
     if (manifesto->versao > versao_anterior &&
         !montar_estado(estado->revogacao.bruta, &estado->versoes, manifesto->arvore,
-                       manifesto->versao, estado_novo))
+                       manifesto->versao, resumo, estado_novo))
         return MERKLE_ERRO_PERSISTENCIA;
     return MERKLE_OK;
 }
@@ -127,8 +139,8 @@ enum resultado_merkle iniciar_estado(
     enum resultado_merkle motivo = verificar_assinatura(politica.conjunto, politica.chave_revogacao, tabela);
     if (motivo != MERKLE_OK)
         return motivo;
-    const struct registros vazio = {0};
-    return montar_estado(tabela, &vazio, 0, 0, estado_novo) ? MERKLE_OK : MERKLE_ERRO_PERSISTENCIA;
+    const struct registros vazio = { .largura = VERSAO_BYTES };
+    return montar_estado(tabela, &vazio, 0, 0, NULL, estado_novo) ? MERKLE_OK : MERKLE_ERRO_PERSISTENCIA;
 }
 
 enum resultado_merkle atualizar_revogacao(
@@ -160,9 +172,9 @@ enum resultado_merkle atualizar_revogacao(
     }
 
     const unsigned char *registro = anterior->geracoes.dados;
-    for (uint32_t i = 0; i < anterior->geracoes.quantidade; i++, registro += REGISTRO_BYTES) {
+    for (uint32_t i = 0; i < anterior->geracoes.quantidade; i++, registro += GERACAO_BYTES) {
         if (valor_registro(&nova.geracoes, ler_u32(registro)) < ler_u64(registro + 4))
             return MERKLE_REVOGACAO_REGRESSIVA;
     }
-    return montar_estado(tabela, &estado.versoes, 0, 0, estado_novo) ? MERKLE_OK : MERKLE_ERRO_PERSISTENCIA;
+    return montar_estado(tabela, &estado.versoes, 0, 0, NULL, estado_novo) ? MERKLE_OK : MERKLE_ERRO_PERSISTENCIA;
 }

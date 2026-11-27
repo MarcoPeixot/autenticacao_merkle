@@ -121,21 +121,21 @@ bool ler_politica(struct bytes bruto, const struct manifesto *manifesto, uint32_
     return bruto.tamanho == 0;
 }
 
-static bool ler_registros(struct bytes bruto, uint32_t quantidade, bool versoes,
+static bool ler_registros(struct bytes bruto, uint32_t quantidade, size_t largura, bool versoes,
                           struct registros *saida)
 {
-    if (bruto.tamanho % REGISTRO_BYTES != 0 || bruto.tamanho / REGISTRO_BYTES != quantidade)
+    if (bruto.tamanho % largura != 0 || bruto.tamanho / largura != quantidade)
         return false;
 
     uint32_t anterior = 0;
     const unsigned char *entrada = bruto.dados;
-    for (uint32_t i = 0; i < quantidade; i++, entrada += REGISTRO_BYTES) {
+    for (uint32_t i = 0; i < quantidade; i++, entrada += largura) {
         uint32_t id = ler_u32(entrada);
         if ((i != 0 && id <= anterior) || (versoes && (id == 0 || ler_u64(entrada + 4) == 0)))
             return false;
         anterior = id;
     }
-    *saida = (struct registros){ bruto.dados, quantidade };
+    *saida = (struct registros){ bruto.dados, quantidade, largura };
     return true;
 }
 
@@ -150,8 +150,8 @@ bool ler_revogacao(struct bytes bruto, size_t assinatura_bytes, struct tabela_re
     struct bytes entradas = {
         bruto.dados + REVOGACAO_CABECALHO, bruto.tamanho - REVOGACAO_CABECALHO - assinatura_bytes,
     };
-    return saida->versao != 0 && ler_registros(entradas, ler_u32(bruto.dados + 13), false,
-                                              &saida->geracoes);
+    return saida->versao != 0 && ler_registros(entradas, ler_u32(bruto.dados + 13), GERACAO_BYTES,
+                                              false, &saida->geracoes);
 }
 
 bool ler_estado(struct bytes bruto, size_t assinatura_bytes, struct estado_mrauth *saida)
@@ -165,7 +165,7 @@ bool ler_estado(struct bytes bruto, size_t assinatura_bytes, struct estado_mraut
     const unsigned char *quantidade = consumir(&bruto, 4);
     return tabela && quantidade && ler_revogacao((struct bytes){ tabela, tamanho }, assinatura_bytes,
                                                  &saida->revogacao) &&
-           ler_registros(bruto, ler_u32(quantidade), true, &saida->versoes);
+           ler_registros(bruto, ler_u32(quantidade), VERSAO_BYTES, true, &saida->versoes);
 }
 
 static size_t buscar(const struct registros *lista, uint32_t id)
@@ -173,7 +173,7 @@ static size_t buscar(const struct registros *lista, uint32_t id)
     size_t inicio = 0, fim = lista->quantidade;
     while (inicio < fim) {
         size_t meio = inicio + (fim - inicio) / 2;
-        if (ler_u32(lista->dados + meio * REGISTRO_BYTES) < id)
+        if (ler_u32(lista->dados + meio * lista->largura) < id)
             inicio = meio + 1;
         else
             fim = meio;
@@ -183,17 +183,23 @@ static size_t buscar(const struct registros *lista, uint32_t id)
 
 static bool contem(const struct registros *lista, size_t posicao, uint32_t id)
 {
-    return posicao < lista->quantidade && ler_u32(lista->dados + posicao * REGISTRO_BYTES) == id;
+    return posicao < lista->quantidade && ler_u32(lista->dados + posicao * lista->largura) == id;
+}
+
+const unsigned char *buscar_registro(const struct registros *lista, uint32_t id)
+{
+    size_t posicao = buscar(lista, id);
+    return contem(lista, posicao, id) ? lista->dados + posicao * lista->largura : NULL;
 }
 
 uint64_t valor_registro(const struct registros *lista, uint32_t id)
 {
-    size_t posicao = buscar(lista, id);
-    return contem(lista, posicao, id) ? ler_u64(lista->dados + posicao * REGISTRO_BYTES + 4) : 0;
+    const unsigned char *registro = buscar_registro(lista, id);
+    return registro ? ler_u64(registro + 4) : 0;
 }
 
-bool montar_estado(struct bytes tabela, const struct registros *versoes,
-                   uint32_t arvore, uint64_t versao, struct buffer *saida)
+bool montar_estado(struct bytes tabela, const struct registros *versoes, uint32_t arvore,
+                   uint64_t versao, const unsigned char *resumo, struct buffer *saida)
 {
     const size_t fixo = ESTADO_CABECALHO + 4;
     size_t posicao = arvore ? buscar(versoes, arvore) : versoes->quantidade;
@@ -204,10 +210,10 @@ bool montar_estado(struct bytes tabela, const struct registros *versoes,
         return false;
 
     size_t quantidade = versoes->quantidade + acrescenta;
-    if (quantidade > (SIZE_MAX - fixo - tabela.tamanho) / REGISTRO_BYTES)
+    if (quantidade > (SIZE_MAX - fixo - tabela.tamanho) / VERSAO_BYTES)
         return false;
 
-    size_t tamanho = fixo + tabela.tamanho + quantidade * REGISTRO_BYTES;
+    size_t tamanho = fixo + tabela.tamanho + quantidade * VERSAO_BYTES;
     unsigned char *dados = malloc(tamanho);
     if (dados == NULL)
         return false;
@@ -218,15 +224,16 @@ bool montar_estado(struct bytes tabela, const struct registros *versoes,
     gravar_u32(dados + ESTADO_CABECALHO + tabela.tamanho, (uint32_t)quantidade);
     unsigned char *destino = dados + fixo + tabela.tamanho;
     if (posicao != 0)
-        memcpy(destino, versoes->dados, posicao * REGISTRO_BYTES);
+        memcpy(destino, versoes->dados, posicao * VERSAO_BYTES);
     if (arvore) {
-        unsigned char *entrada = destino + posicao * REGISTRO_BYTES;
+        unsigned char *entrada = destino + posicao * VERSAO_BYTES;
         gravar_u32(entrada, arvore);
         gravar_u64(entrada + 4, versao);
+        memcpy(entrada + VERSAO_RESUMO, resumo, HASH_BYTES);
         size_t inicio = posicao + substitui;
         if (inicio < versoes->quantidade)
-            memcpy(entrada + REGISTRO_BYTES, versoes->dados + inicio * REGISTRO_BYTES,
-                   (versoes->quantidade - inicio) * REGISTRO_BYTES);
+            memcpy(entrada + VERSAO_BYTES, versoes->dados + inicio * VERSAO_BYTES,
+                   (versoes->quantidade - inicio) * VERSAO_BYTES);
     }
     *saida = (struct buffer){ dados, tamanho };
     return true;
