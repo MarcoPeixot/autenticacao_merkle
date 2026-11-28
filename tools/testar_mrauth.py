@@ -157,11 +157,15 @@ def testar(executavel, formato, conjunto, pasta, completo):
     caso.verificar("arvore complementar vazia", "FORMATO_INVALIDO", vazio, prova, raiz)
     outro_formato, _, _ = caso.manifesto(versao=2, formato=3 - formato)
     caso.verificar("formato de manifesto", "FORMATO_INVALIDO", outro_formato, prova)
+    principal, prova_principal, _ = caso.manifesto(arvore=0)
+    caso.verificar("manifesto da arvore principal", "FORMATO_INVALIDO", principal, prova_principal)
 
     desconhecido, _, _ = caso.manifesto(versao=2, autoridade=3)
     caso.verificar("autoridade desconhecida", "AUTORIDADE_NAO_AUTORIZADA", desconhecido, prova)
     fora_da_politica, _, _ = caso.manifesto(versao=2, autoridade=2)
     caso.verificar("autoridade fora da arvore", "AUTORIDADE_NAO_AUTORIZADA", fora_da_politica, prova)
+    sem_dono, prova_sem_dono, _ = caso.manifesto(arvore=9)
+    caso.verificar("arvore fora da politica", "AUTORIDADE_NAO_AUTORIZADA", sem_dono, prova_sem_dono)
     ambigua = caso.arquivo("politica ambigua", caso.montar_politica({1: (7,), 2: (3, 7)}))
     caso.verificar("arvore com duas autoridades", "AUTORIDADE_NAO_AUTORIZADA", manifesto_v2, prova,
                    politica=ambigua)
@@ -189,8 +193,10 @@ def testar(executavel, formato, conjunto, pasta, completo):
     caso.verificar("arvore de uma folha", "OK", uma_folha, prova_uma, raiz_uma, modulo=unico[0])
 
     revogacao = caso.tabela(2, ((COMPONENTE, 3),))
+    caso.gerir("revogar", "tabela de outro assinante", "ASSINATURA_INVALIDA", caso.tabela(2, ((COMPONENTE, 3),), autoridade=1))
     caso.gerir("revogar", "revogar", "OK", revogacao)
     caso.gerir("revogar", "repetir revogacao", "OK", caso.tabela(2, ((COMPONENTE, 3),)))
+    caso.gerir("revogar", "tabela antiga com os mesmos minimos", "ROLLBACK", caso.tabela(1, ((COMPONENTE, 3),)))
     caso.gerir("revogar", "tabela antiga", "ROLLBACK", inicial)
     caso.gerir("revogar", "mesma versao de tabela", "ROLLBACK", caso.tabela(2, ((COMPONENTE, 4),)))
     caso.gerir("revogar", "diminuir minimo", "REVOGACAO_REGRESSIVA", caso.tabela(3))
