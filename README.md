@@ -53,11 +53,24 @@ Conferimos que o ambiente tem ML-DSA, que é o que vai assinar os manifestos, e 
 2. **Testes** (`tests/test_ml_dsa.py`). Mais 13, agora são 79.
 3. **Resultado** (`docs/ml-dsa.md`).
 
+## Quinta entrega (27/11/2026)
+
+Entraram a especificação e o verificador em C de várias raízes, da frente C, e o modelo de segurança, da frente A.
+
+1. **Especificação** (`spec/README.md`). Formatos do manifesto, da política, da tabela de revogação e do estado, byte a byte, e as regras R1 a R8 na ordem em que o verificador as aplica.
+2. **Verificador em C** (`verifier/`). Raiz principal igual à do patch e árvores complementares com ML-DSA, política, versões e revogação, mais a variante com endereços nos nós. Os testes rodam pelo Docker (`tools/testar_verificador.py`).
+3. **Modelo de ameaças** (`docs/modelo-de-ameacas.md`). Participantes, o que é íntegro, o que o atacante pode fazer e as três violações.
+4. **Argumento de segurança** (`docs/argumento-de-seguranca.md`). Liga cada violação às regras, às hipóteses sobre o SHA-256 e o ML-DSA e aos casos de teste, e revisa a especificação contra o modelo.
+5. **Conta do multi-alvo** (`docs/conta-multialvo.md`), clássica e quântica, com os limites de Hülsing, Rijneveld e Song.
+6. **TUF e SBAT** (`docs/tuf-e-sbat.md`). O que aproveitamos de cada um e o que ficou de fora.
+7. **Mutações do verificador** (`tools/mutar_verificador.py`). Tira uma checagem do C por vez e confere que algum teste acusa a falta dela.
+8. **Testes**. Agora são 97 em Python (eram 79) e 98 checagens de várias raízes no C.
+
 ## Resultados
 
 ### Testes
 
-81 de 81 passando, em Python 3.9 e 3.15. No teste de mutação os testes pegaram os 8 defeitos.
+97 de 97 passando, em Python 3.9 e 3.15. No teste de mutação do modelo em Python os testes pegaram os 8 defeitos. No do verificador em C, acusaram 21 das 22 checagens retiradas, e a que sobra é redundante.
 
 ### Comparação com o código do patch: igual
 
@@ -105,7 +118,7 @@ Dentro de uma árvore o atacante não ganha nada: a coincidência aparece, mas a
 
 Colocar o número da árvore na folha tira esse ganho sem mudar os nós internos nem o tamanho da prova.
 
-Vale para busca clássica com hash truncado. A conta quântica ainda falta.
+O experimento é de busca clássica com hash truncado. Pelos limites de Hülsing, Rijneveld e Song, o caso quântico segue a mesma proporção: com 16 raízes no formato do patch, cerca de 2^126 consultas em vez de 2^128, e com o número da árvore na folha, 2^128. A conta está em `docs/conta-multialvo.md`.
 
 ### Tamanho da prova
 
@@ -143,6 +156,29 @@ Os tempos são de um Apple M5 rodando Linux aarch64 no Docker. Servem para compa
 O `openssl` que vem no macOS é o LibreSSL 3.3.6, que não tem ML-DSA. No Mac, use o Docker, como aqui, ou o OpenSSL do Homebrew.
 
 Para ver se a medição acusa erro, rodamos uma cópia do programa que não alterava a assinatura. Nos três conjuntos a assinatura "alterada" passou e o script apontou o problema.
+
+### Verificador em C: igual ao Python
+
+Nos 100 vetores de raiz única, o verificador em C dá a mesma decisão do modelo em Python, nas duas compilações. Os casos de várias raízes somam 98 checagens nos três conjuntos do ML-DSA, com e sem endereços nos nós. Compila sem avisos e passa com AddressSanitizer e UBSan.
+
+### Hipótese da troca de origem: descartada no verificador
+
+Testamos os seis jeitos de uma autoridade tentar passar um módulo pela árvore de outra. Todos foram recusados, e cada checagem envolvida tem um teste que acusa a falta dela. O registro está em `docs/hipoteses.md` (H3).
+
+### Modelo de segurança: cada violação tem regra e teste
+
+| Violação | O que é | Regras | Hipóteses |
+| --- | --- | --- | --- |
+| V1 origem | Aceitar módulo que a autoridade honesta da árvore não publicou | R1, R2, R3, R7 | ML-DSA não forjável; segunda pré-imagem do SHA-256 |
+| V2 permissão | Dar ao módulo permissão fora da máscara da política | R4, com R2 | ML-DSA não forjável |
+| V3 estado | Aceitar versão antiga, outro manifesto com a mesma versão ou geração revogada | R5, R6 | ML-DSA não forjável; colisão do SHA-256 |
+
+Tiramos do verificador 22 checagens, uma por vez, e rodamos os testes:
+- 21 foram acusadas;
+- a que sobra é a de zero folhas, que a profundidade e a posição já cobrem;
+- na primeira rodada, duas sobreviveram e mostraram buracos nos testes: uma árvore sem dono na política e o `revogar` com tabela de outro assinante. Ganharam testes, junto com o de tabela antiga com os mesmos mínimos.
+
+A revisão da especificação contra o modelo deixou dois pontos para o grupo. O primeiro é o congelamento: a versão de uma árvore só sobe quando um módulo da versão nova é carregado. O segundo é o reetiquetamento: uma autoridade corrompida pode republicar código antigo com geração nova, como no SBAT. Os dois estão em `docs/argumento-de-seguranca.md`.
 
 ## Rodar
 
@@ -186,12 +222,13 @@ python3 -m tools.tamanhos_de_prova --gravar     # tabela de tamanhos
 python3 -m tools.gerar_vetores --gravar         # vetores de teste
 ```
 
-A comparação com o código do patch, a medição do ML-DSA e os testes do verificador em C ficam fora do `reproduzir.py` porque precisam de Docker. Na primeira vez entra também o download da imagem do Debian.
+A comparação com o código do patch, a medição do ML-DSA e os testes e as mutações do verificador em C ficam fora do `reproduzir.py` porque precisam de Docker. Na primeira vez entra também o download da imagem do Debian.
 
 ```
 python3 -m tools.comparar_com_patch --gravar   # menos de um minuto
 python3 -m tools.medir_ml_dsa --gravar         # uns 10 segundos
 python3 -m tools.testar_verificador            # uns 10 segundos
+python3 -m tools.mutar_verificador --gravar    # uns 10 segundos
 ```
 
 Na medição do ML-DSA, tamanhos e checagens saem sempre iguais. Os tempos mudam um pouco a cada execução.
@@ -209,7 +246,7 @@ Os formatos e as regras estão em [`spec/`](spec/README.md).
 
 ## Falta
 
-- conta do multi-alvo no caso quântico
-- revisão da especificação e escolha do conjunto ML-DSA
+- escolha do conjunto ML-DSA
+- decisão sobre o congelamento (a versão só sobe quando um módulo da versão nova é carregado)
 - modelo Python e vetores compartilhados de múltiplas raízes para o teste diferencial
 - medições de tempo e memória
