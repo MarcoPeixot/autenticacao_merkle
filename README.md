@@ -66,11 +66,22 @@ Entraram a especificação e o verificador em C de várias raízes, da frente C,
 7. **Mutações do verificador** (`tools/mutar_verificador.py`). Tira uma checagem do C por vez e confere que algum teste acusa a falta dela.
 8. **Testes**. Agora são 97 em Python (eram 79) e 98 checagens de várias raízes no C.
 
+## Sexta entrega (27/11/2026)
+
+Entraram os conjuntos de teste, o benchmark e uma primeira rodada de medições, da frente D. Os números valem de vez quando o C passar nos vetores compartilhados de várias raízes.
+
+1. **Conjuntos de teste** (`tools/conjuntos.py`). São 128 a 8.192 módulos em 1, 4 e 16 raízes, nas duas variantes. Cada configuração traz as entradas completas do verificador, no formato da especificação: provas, manifestos assinados nos três conjuntos ML-DSA, política e tabela de revogação. As chaves saem de sementes fixas e a assinatura é determinística, então as entradas saem sempre iguais.
+2. **Tamanhos** (`docs/conjuntos.md`, `bench/conjuntos.csv`). Agora entram os bytes dos manifestos, da política, da tabela de revogação e do estado.
+3. **Benchmark** (`bench/medir.c`, `tools/benchmark.py`). O medidor é ligado ao próprio verificador de `verifier/`. Ele confere que todo caso é aceito antes de medir e mede a raiz principal, o caminho complementar, o manifesto e a verificação complementar completa. São 30 rodadas depois do aquecimento, mais a memória. Roda no Debian 13 pelo Docker.
+4. **Tabelas** (`tools/tabelas_benchmark.py`). Saem só dos dados brutos de `bench/dados/`, com mediana e intervalo interquartil. Incluem a comparação entre a variante padrão e a com endereços, que `docs/conta-multialvo.md` pede.
+5. **Testes** (`tests/test_conjuntos.py`, `tests/test_benchmark.py`). Mais 31, agora são 128. As árvores complementares batem com o modelo e com as provas dos testes do C, e os formatos batem com a especificação.
+6. **Primeira rodada** (`bench/dados/`, `docs/benchmark.md`). Benchmark completo no Docker, preliminar até o C passar nos vetores compartilhados.
+
 ## Resultados
 
 ### Testes
 
-97 de 97 passando, em Python 3.9 e 3.15. No teste de mutação do modelo em Python os testes pegaram os 8 defeitos. No do verificador em C, acusaram 21 das 22 checagens retiradas, e a que sobra é redundante.
+128 de 128 passando em Python 3.9. No teste de mutação do modelo em Python os testes pegaram os 8 defeitos. No do verificador em C, acusaram 21 das 22 checagens retiradas, e a que sobra é redundante.
 
 ### Comparação com o código do patch: igual
 
@@ -133,7 +144,15 @@ Bytes de prova por módulo:
 
 A assinatura ML-DSA mais curta (ML-DSA-44) tem 2.420 bytes, 5,8 vezes a maior prova da tabela. A ML-DSA-65 tem 3.309 e a ML-DSA-87 tem 4.627.
 
-Falta somar o manifesto assinado de cada raiz extra, que ainda não tem formato definido.
+Cada raiz extra traz um manifesto de 98 bytes mais a assinatura. Somando a parte de cada módulo nos manifestos, com 16 raízes, em bytes por módulo:
+
+| Módulos | Só a prova | Com manifestos, ML-DSA-44 | Com manifestos, ML-DSA-87 |
+| ---: | ---: | ---: | ---: |
+| 128 | 100 | 395 | 654 |
+| 1.024 | 196 | 233 | 265 |
+| 8.192 | 292 | 297 | 301 |
+
+Os manifestos acrescentam de 37 a 69 bytes por módulo com 1.024 módulos, e menos de 9 com 8.192. Só pesam no conjunto de 128. Mesmo ali, com ML-DSA-87, o custo por módulo é 7 vezes menor que o de uma assinatura por módulo. A tabela completa está em `docs/conjuntos.md`, com a política, a tabela de revogação e o estado, que ficam na máquina e não acompanham os módulos. Com 16 raízes e ML-DSA-87, a política tem 41.842 bytes.
 
 ### ML-DSA no ambiente: os três conjuntos funcionam
 
@@ -160,6 +179,20 @@ Para ver se a medição acusa erro, rodamos uma cópia do programa que não alte
 ### Verificador em C: igual ao Python
 
 Nos 100 vetores de raiz única, o verificador em C dá a mesma decisão do modelo em Python, nas duas compilações. Os casos de várias raízes somam 98 checagens nos três conjuntos do ML-DSA, com e sem endereços nos nós. Compila sem avisos e passa com AddressSanitizer e UBSan.
+
+### Benchmark: primeira rodada, preliminar
+
+O medidor roda o verificador em C nas 12 configurações, nas duas variantes e nos três conjuntos ML-DSA. Antes de medir, confere que todo caso é aceito. A primeira rodada completa foi feita no Debian 13 pelo Docker, num Apple M4, com 30 rodadas por operação. Os dados brutos estão em `bench/dados/` e as tabelas em `docs/benchmark.md`. Os números são preliminares até o C passar nos vetores compartilhados de várias raízes.
+
+`verificar_complementar` confere a assinatura ML-DSA do manifesto a cada módulo, e não uma vez por raiz, como supõe a conta da seção do ML-DSA. Por isso, a conferência do manifesto fica com 94% a 99% do tempo de cada verificação complementar. Tempo para verificar 8.192 módulos com 16 raízes:
+
+| | ML-DSA-44 | ML-DSA-87 |
+| --- | ---: | ---: |
+| Uma raiz, como o patch | 19,0 ms | 19,0 ms |
+| Manifesto conferido a cada módulo, como o verificador faz hoje | 499,1 ms | 1.130,9 ms |
+| Manifesto conferido uma vez por raiz | 16,0 ms | 17,5 ms |
+
+O caminho da variante com endereços leva de 0,91 a 1,10 vez o da padrão, com mediana de 1,01, nas 24 configurações com raízes complementares. O pico de memória do medidor vai de 5,8 a 10,0 MiB, e quase toda a diferença são as entradas carregadas. Fica para a frente C decidir se o verificador guarda o manifesto já conferido.
 
 ### Hipótese da troca de origem: descartada no verificador
 
@@ -199,8 +232,9 @@ ok      experimento da posição     2.9s   gravado em docs/experimento-posicao.
 ok      experimento multi-alvo     3.6s   gravado em docs/experimento-multialvo.md
 ok      tabela de tamanhos         0.1s   gravado em docs/ e bench/
 ok      vetores de teste           0.0s   gravado em vectors/raiz-unica.json
+ok      conjuntos de teste         0.3s   gravado em docs/conjuntos.md e bench/conjuntos.csv
 
-tudo certo em 8.2s
+tudo certo em 8.5s
 ```
 
 Os arquivos em `docs/`, `bench/` e `vectors/` são regravados e têm de sair iguais (`git status` fica limpo).
@@ -220,16 +254,21 @@ python3 -m tools.experimento_posicao --gravar   # experimento da posição
 python3 -m tools.experimento_multialvo --gravar # experimento multi-alvo
 python3 -m tools.tamanhos_de_prova --gravar     # tabela de tamanhos
 python3 -m tools.gerar_vetores --gravar         # vetores de teste
+python3 -m tools.conjuntos --gravar             # tamanhos dos conjuntos de teste
 ```
 
-A comparação com o código do patch, a medição do ML-DSA e os testes e as mutações do verificador em C ficam fora do `reproduzir.py` porque precisam de Docker. Na primeira vez entra também o download da imagem do Debian.
+A comparação com o código do patch, a medição do ML-DSA, os testes e as mutações do verificador em C e o benchmark ficam fora do `reproduzir.py` porque precisam de Docker. Na primeira vez entra também o download da imagem do Debian.
 
 ```
 python3 -m tools.comparar_com_patch --gravar   # menos de um minuto
 python3 -m tools.medir_ml_dsa --gravar         # uns 10 segundos
 python3 -m tools.testar_verificador            # uns 10 segundos
 python3 -m tools.mutar_verificador --gravar    # uns 10 segundos
+python3 -m tools.benchmark --gravar            # benchmark do verificador em C, em bench/dados/
+python3 -m tools.tabelas_benchmark --gravar    # tabelas do benchmark, só a partir de bench/dados/
 ```
+
+O método do benchmark, os conjuntos de teste e o formato dos dados brutos estão em [`bench/`](bench/README.md).
 
 Na medição do ML-DSA, tamanhos e checagens saem sempre iguais. Os tempos mudam um pouco a cada execução.
 
@@ -249,4 +288,6 @@ Os formatos e as regras estão em [`spec/`](spec/README.md).
 - escolha do conjunto ML-DSA
 - decisão sobre o congelamento (a versão só sobe quando um módulo da versão nova é carregado)
 - modelo Python e vetores compartilhados de múltiplas raízes para o teste diferencial
-- medições de tempo e memória
+- medições de tempo e memória: refazer a rodada quando o C passar nos vetores compartilhados e medir a linha de base de uma assinatura ML-DSA por módulo (hoje é estimada)
+- decisão sobre conferir o manifesto uma vez por raiz em vez de a cada módulo
+- artigo e apresentação

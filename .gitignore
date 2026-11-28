@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 .DS_Store
 verifier/build/
+bench/conjuntos/
+bench/build/
+paper/

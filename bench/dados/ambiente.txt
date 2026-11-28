@@ -1,0 +1,7 @@
+- arquitetura: aarch64
+- compilador: cc (Debian 14.2.0-19) 14.2.0
+- openssl: OpenSSL 3.5.9 29 Sep 2026 (Library: OpenSSL 3.5.9 29 Sep 2026)
+- sistema: Debian GNU/Linux 13 (trixie)
+- rodadas: 30
+- avisos ao compilar: nenhum
+- máquina: Apple M4, macOS; Docker Desktop, 10 CPUs
