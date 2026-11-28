@@ -144,3 +144,5 @@ principal recebe a raiz confiável e representa a autoridade de identificador
 zero. Na rota complementar, raiz e autoridade ficam ausentes até o manifesto
 passar por R2. O teste diferencial usa a mesma entrada, estado inicial e
 saída esperada para as duas implementações.
+
+O modelo de ameaças está em [`docs/modelo-de-ameacas.md`](../docs/modelo-de-ameacas.md). A ligação de cada regra com as violações que ela barra, e os testes que acusam a falta dela, está em [`docs/argumento-de-seguranca.md`](../docs/argumento-de-seguranca.md).
